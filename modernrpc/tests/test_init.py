@@ -6,7 +6,6 @@ from modernrpc.apps import check_required_settings_defined
 
 
 def test_settings_check(settings):
-
     # With default testsite.settings, check method shouldn't complain
     assert len(check_required_settings_defined(apps.get_app_config("modernrpc"))) == 0
 
@@ -19,13 +18,11 @@ def test_settings_check(settings):
 
 
 def test_warning_on_invalid_module_reference(settings, rpc_registry):
-
     # Update setting value, to only contain reference to an invalid module
     settings.MODERNRPC_METHODS_MODULES = ['invalid.module.reference']
-
-    # This will ensure a warning is thrown, due to invalid module specified
     app = apps.get_app_config("modernrpc")
-    with pytest.warns(Warning):
+
+    with pytest.raises(ImportError):
         app.ready()
 
     # Now, we should have removed all custom methods from the registry
@@ -34,7 +31,6 @@ def test_warning_on_invalid_module_reference(settings, rpc_registry):
 
 
 def test_registry_empty_if_settings_not_defined(settings, rpc_registry):
-
     # Update setting value to remove any value
     settings.MODERNRPC_METHODS_MODULES = None
 

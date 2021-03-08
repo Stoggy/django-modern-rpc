@@ -1,6 +1,5 @@
 # coding: utf-8
 import inspect
-import warnings
 from importlib import import_module
 
 import django.core.checks
@@ -32,7 +31,6 @@ def check_required_settings_defined(app_configs, **kwargs):
 
 
 class ModernRpcConfig(AppConfig):
-
     name = 'modernrpc'
     verbose_name = 'Django Modern RPC'
 
