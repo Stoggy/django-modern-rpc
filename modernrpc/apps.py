@@ -57,16 +57,8 @@ class ModernRpcConfig(AppConfig):
 
         # Lookup content of MODERNRPC_METHODS_MODULES, and add the module containing system methods
         for module_name in settings.MODERNRPC_METHODS_MODULES + ['modernrpc.system_methods']:
-
-            try:
-                # Import the module in current scope
-                rpc_module = import_module(module_name)
-
-            except ImportError:
-                msg = 'Unable to load module "{}" declared in settings.MODERNRPC_METHODS_MODULES. Please ensure ' \
-                      'it is available and doesn\'t contain any error'.format(module_name)
-                warnings.warn(msg, category=Warning)
-                continue
+            # Import the module in current scope
+            rpc_module = import_module(module_name)
 
             # Lookup all global functions in module
             for _, func in inspect.getmembers(rpc_module, inspect.isfunction):
