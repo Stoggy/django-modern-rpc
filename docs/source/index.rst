@@ -2,10 +2,20 @@
 Django-modern-rpc
 =================
 
+.. _test:
+
 Welcome to the django-modern-rpc documentation. You will find here everything you need
-to quickly :ref:`install <installation>` and :ref:`configure <configuration>` the library for your own project.
+to quickly :doc:`basics/quickstart` and config... the library for your own project.
 
 In addition, you will find detailed documentation including the ways you can hack the default behaviors.
+
+Useful links
+------------
+
+:Code:      https://github.com/alorence/django-modern-rpc
+:Issues:    https://github.com/alorence/django-modern-rpc/issues
+:Package:   https://pypi.org/project/django-modern-rpc/
+:License:   MIT
 
 Changelog
 ---------
@@ -15,34 +25,27 @@ The full changelog can be found on Github_
 .. _Github: https://github.com/alorence/django-modern-rpc/blob/master/CHANGELOG.md
 
 .. toctree::
-   :maxdepth: 3
-   :hidden:
-   :caption: Quickstart
-   :name: quickstart
+   :caption: Basic setup
+   :name: basics
 
-   quickstart/installation.rst
-   quickstart/configuration.rst
-
-.. toctree::
-   :maxdepth: 3
-   :hidden:
-   :caption: Reference Documentation
-   :name: main-docs
-
-   docs/methods_registration.rst
-   docs/entry_point.rst
-   docs/authentication.rst
-   docs/error_handling.rst
-   docs/data_types_support.rst
-   docs/system_methods.rst
-   docs/generated_docs.rst
-   docs/settings.rst
+   basics/quickstart.rst
+   basics/register_procedure.rst
+   basics/entry_point.rst
+   basics/error_handling.rst
+   basics/settings.rst
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
-   :caption: Misc
-   :name: misc
+   :caption: Advanced topics
+   :name: advanced
+
+   advanced/data_types_support.rst
+   advanced/authentication.rst
+   advanced/system_methods.rst
+   advanced/generated_docs.rst
+   biblio.rst
+
+.. toctree::
+   :caption: How to contribute
+   :name: contribute
 
    contribute.rst
-   biblio.rst

@@ -4,11 +4,11 @@ Settings
 
 Django-modern-rpc behavior can be customized by defining some values in project's ``settings.py``.
 
-Basic configuration
-===================
+Basic settings
+==============
 
-``MODERNRPC_METHODS_MODULES``
------------------------------
+MODERNRPC_METHODS_MODULES
+-------------------------
 
 Default: ``[]`` (Empty list)
 

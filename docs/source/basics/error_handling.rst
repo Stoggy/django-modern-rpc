@@ -1,6 +1,24 @@
 Error handling
 ==============
 
+Internally, django-modern-rpc must deal with a number of errors. Anything can break, from request parsing to procedure
+execution. Even result serialization may fail. In any situation, both XML-RPC and JSON-RPC standards state an correct
+error result must be returned to client.
+
+Such result must contain an error code, and a text message providing more context. Here is the list of common errors:
+
+.. list-table:: Common errors
+   :widths: 20 50
+   :header-rows: 1
+
+   * - Code
+     - Message
+   * - -32700
+     - parse error. not well formed
+   * - -32701
+     - parse error. unsupported encoding
+
+
 RPC Error codes and pre-defined exceptions
 ------------------------------------------
 
