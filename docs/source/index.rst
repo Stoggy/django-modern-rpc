@@ -38,11 +38,11 @@ The full changelog can be found on Github_
    :caption: Advanced topics
    :name: advanced
 
+   advanced/implem_details.rst
    advanced/data_types_support.rst
    advanced/authentication.rst
    advanced/system_methods.rst
    advanced/generated_docs.rst
-   biblio.rst
 
 .. toctree::
    :caption: How to contribute
