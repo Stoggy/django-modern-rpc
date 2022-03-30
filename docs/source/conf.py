@@ -63,6 +63,11 @@ html_static_path = ["_static"]
 
 # -- Theme options ------------------------------------------------------------
 
+img_permalink_style = "display: inline; max-height: 1rem; margin-left: 0.3rem; margin-top: 0; margin-bottom: 0"
+html_permalinks_icon = (
+    f'<img src="/_static/link-icon.png" style="{img_permalink_style}" />'
+)
+
 html_theme_options = {
     "show_breadcrumbs": True,
     "extra_header_links": {

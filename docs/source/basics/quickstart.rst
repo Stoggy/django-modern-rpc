@@ -47,7 +47,7 @@ Declare ``settings.MODERNRPC_METHODS_MODULES`` to indicate all python modules wh
    :caption: myproject/settings.py
 
     MODERNRPC_METHODS_MODULES = [
-        'rpc_app.rpc_methods'
+        'myapp.remote_procedures'
     ]
 
 Create an entry point

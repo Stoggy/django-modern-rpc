@@ -10,47 +10,96 @@ Basic settings
 MODERNRPC_METHODS_MODULES
 -------------------------
 
-Default: ``[]`` (Empty list)
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     Yes
+    **Default**      ``[]`` (Empty list)
+   ================ ===================
 
 Define the list of python modules containing RPC methods. You must set this list with at least one module.
 At startup, the list is looked up to register all python functions decorated with `@rpc_method`.
 
-``MODERNRPC_LOG_EXCEPTIONS``
------------------------------
+MODERNRPC_LOG_EXCEPTIONS
+------------------------
 
-Default: ``True``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``True``
+   ================ ===================
 
 Set to False if you want to disable logging on exception catching
 
+MODERNRPC_DOC_FORMAT
+--------------------
 
-JSON Serialization and deserialization
-======================================
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``""`` (Empty string)
+   ================ ===================
+
+Configure the format of the docstring used to document your RPC methods.
+
+Possible values are: ``""``, ``rst`` or ``markdown``.
+
+.. note::
+    The corresponding package is not automatically installed. You have to ensure library `markdown` or `docutils` is
+    installed in your environment if you set ``settings.MODERNRPC_DOC_FORMAT`` to a non-empty value
+
+
+JSON-RPC specific
+=================
 You can configure how JSON-RPC handler will serialize and unserialize data:
 
-``MODERNRPC_JSON_DECODER``
---------------------------
+MODERNRPC_JSON_DECODER
+----------------------
 
-Default: ``'json.decoder.JSONDecoder'``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``"json.decoder.JSONDecoder"``
+   ================ ===================
 
 Decoder class used to convert JSON data to python values.
 
-``MODERNRPC_JSON_ENCODER``
---------------------------
+MODERNRPC_JSON_ENCODER
+----------------------
 
-Default: ``'django.core.serializers.json.DjangoJSONEncoder'``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``"django.core.serializers.json.DjangoJSONEncoder"``
+   ================ ===================
 
 Encoder class used to convert python values to JSON data. Internally, modernrpc uses the default `Django JSON encoder`_,
 which improves the builtin python encoder by adding support for additional types (DateTime, UUID, etc.).
 
 .. _Django JSON encoder: https://docs.djangoproject.com/en/dev/topics/serialization/#djangojsonencoder
 
-XML serialization and deserialization
-=====================================
+JSON-RPC specific
+=================
 
-``MODERNRPC_XMLRPC_USE_BUILTIN_TYPES``
+MODERNRPC_XMLRPC_USE_BUILTIN_TYPES
 --------------------------------------
 
-Default: ``True``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``True``
+   ================ ===================
 
 Control how builtin types are handled by XML-RPC serializer and deserializer. If set to True (default), dates will be
 converted to ``datetime.datetime`` by XML-RPC deserializer. If set to False, dates will be converted to
@@ -62,59 +111,65 @@ This setting will be passed directly to `ServerProxy`_ instantiation.
 .. _equivalent: https://docs.python.org/2/library/xmlrpclib.html#datetime-objects
 .. _ServerProxy: https://docs.python.org/3/library/xmlrpc.client.html#xmlrpc.client.ServerProxy
 
-``MODERNRPC_XMLRPC_ALLOW_NONE``
--------------------------------
+MODERNRPC_XMLRPC_ALLOW_NONE
+---------------------------
 
-Default: ``True``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``True``
+   ================ ===================
 
 Control how XML-RPC serializer will handle None values. If set to True (default), None values will be converted to
 `<nil>`. If set to False, the serializer will raise a ``TypeError`` when encountering a `None` value.
 
-``MODERNRPC_XMLRPC_DEFAULT_ENCODING``
--------------------------------------
+MODERNRPC_XMLRPC_DEFAULT_ENCODING
+---------------------------------
 
-Default: ``None``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``None``
+   ================ ===================
 
 Configure the default encoding used by XML-RPC serializer.
 
-``MODERNRPC_XML_USE_BUILTIN_TYPES``
------------------------------------
-
-Default: ``True``
+MODERNRPC_XML_USE_BUILTIN_TYPES
+-------------------------------
 
 Deprecated. Define ``MODERNRPC_XMLRPC_USE_BUILTIN_TYPES`` instead.
 
 
-RPC entry points configuration
-==============================
+Entry points configuration
+==========================
 
-``MODERNRPC_HANDLERS``
-----------------------
+MODERNRPC_HANDLERS
+------------------
 
-Default: ``['modernrpc.handlers.JSONRPCHandler', 'modernrpc.handlers.XMLRPCHandler']``
+.. table::
+   :width: 100%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``['modernrpc.handlers.JSONRPCHandler', 'modernrpc.handlers.XMLRPCHandler']``
+   ================ ===================
 
 List of handler classes used by default in any ``RPCEntryPoint`` instance. If you defined your custom handler for any
 protocol, you can replace the default class used
 
-``MODERNRPC_DEFAULT_ENTRYPOINT_NAME``
--------------------------------------
+MODERNRPC_DEFAULT_ENTRYPOINT_NAME
+---------------------------------
 
-Default: ``'__default_entry_point__'``
+.. table::
+   :width: 60%
+
+   ================ ===================
+    **Required**     No
+    **Default**      ``"__default_entry_point__"``
+   ================ ===================
 
 Default name used for anonymous ``RPCEntryPoint``
-
-Other available settings
-========================
-
-``MODERNRPC_DOC_FORMAT``
-------------------------
-
-Default: ``''`` (Empty String)
-
-Configure the format of the docstring used to document your RPC methods.
-
-Possible values are: ``(empty)``, ``rst`` or ``markdown``.
-
-.. note::
-    The corresponding package is not automatically installed. You have to ensure library `markdown` or `docutils` is
-    installed in your environment if you set ``settings.MODERNRPC_DOC_FORMAT`` to a non-empty value

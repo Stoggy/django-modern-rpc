@@ -44,3 +44,42 @@ available at https://www.jsonrpc.org/specification
 The current official standard for JSON format is `RFC 8259`_.
 
 .. _RFC 8259: https://datatracker.ietf.org/doc/html/rfc8259
+
+Types support
+-------------
+
+Most of the time, django-modern-rpc will serialize and unserialize
+
+.. table::
+   :width: 100%
+
+   ================ ========== ========== ===================
+    RPC Data type    XML-RPC    JSON-RPC   Python conversion
+   ================ ========== ========== ===================
+    null             ✓ (1)      ✓          None
+    string           ✓          ✓          str
+    int              ✓          ✓          int
+    float            ✓          ✓          float
+    boolean          ✓          ✓          bool
+    array            ✓          ✓          list
+    struct           ✓          ✓          dict
+    date             ✓          ✗ (2)      See (2)
+    bas64            ✓ (3)      N/A        See (3)
+   ================ ========== ========== ===================
+
+**(1) null and NoneType**
+
+By default, both JSON-RPC and XML-RPC handlers can serialize None and deserialize null value. The XML handler will
+convert such values to `<nil/>` special argument, JSON one will convert to JSON null.
+
+But some old XML-RPC clients may misunderstand the `<nil/>` value. If needed, you can disable its support by setting
+:ref:`MODERNRPC_XMLRPC_ALLOW_NONE` to `False`. The XML-RPC marshaller will raise an exception on None serialization
+or `<nil/>` deserialization.
+
+**(2) Date types**
+
+XMl-RPC specs define
+
+**base64**
+
+TBD
