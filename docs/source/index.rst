@@ -39,7 +39,6 @@ The full changelog can be found on Github_
    :name: advanced
 
    advanced/implem_details.rst
-   advanced/data_types_support.rst
    advanced/authentication.rst
    advanced/system_methods.rst
    advanced/generated_docs.rst

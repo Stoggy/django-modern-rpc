@@ -1,6 +1,6 @@
 # coding: utf-8
 # JSON-RPC error codes
-# From http://www.jsonrpc.org/specification#error_object
+# From https://www.jsonrpc.org/specification#error_object
 #
 # -32700              Parse error 	    Invalid JSON was received by the server.
 #                                         An error occurred on the server while parsing the JSON text.

@@ -78,8 +78,83 @@ or `<nil/>` deserialization.
 
 **(2) Date types**
 
-XMl-RPC specs define
+JSON transport has no specific support of dates, they are transmitted as string formatted with ISO 8601 standard.
+The behavior of default encoder and decoder classes is:
+
+- Input date (RPC method argument)
+
+  * Dates are transmitted as standard string. Decoder will NOT try to recognize dates to apply specific treatment
+
+- Output date (RPC method return type)
+
+  * ``datetime.datetime`` objects will be automatically converted to string (format ISO 8601), so JSON-RPC clients
+    will be able to handle it as usual. This behavior is due to the use of ``DjangoJSONEncoder`` as default encoder.
+
+If you need to customize behavior of JSON encoder and/or decoder, you can specify another classes in ``settings.py``::
+
+    MODERNRPC_JSON_DECODER = 'json.decoder.JSONDecoder'
+    MODERNRPC_JSON_ENCODER = 'django.core.serializers.json.DjangoJSONEncoder'
+
+XML-RPC transport defines a type to handle dates and date/times: ``dateTime.iso8601``. Conversion is done as follow:
+
+- Input date (RPC method argument)
+
+  * If ``settings.MODERNRPC_XMLRPC_USE_BUILTIN_TYPES = True (default)``, the date will be converted to
+    ``datetime.datetime``
+  * If ``settings.MODERNRPC_XMLRPC_USE_BUILTIN_TYPES = False``, the date will be converted to
+    ``xmlrpc.client.DateTime`` (Python 3) or ``xmlrpclib.DateTime`` (Python 2)
+
+- Output date (RPC method return type)
+
+  * Any object of type ``datetime.datetime``, ``xmlrpclib.DateTime`` or ``xmlrpc.client.DateTime`` will
+    be converted to ``dateTime.iso8601`` in XML response
+
+To simplify dates handling in your procedures, you can use `get_builtin_date()` helper to convert any input into
+a buildin `datetime.datetime`.
+
+.. autofunction:: modernrpc.helpers.get_builtin_date
 
 **base64**
 
-TBD
+base64 is not specifically supported, but you should be able to serialize and unserialize base64 encoded data as string.
+
+Logging
+-------
+
+Internally, django-modern-rpc use Python logging system. While messages are usually hidden by default Django logging
+configuration, you can easily show them if needed.
+
+You only have to configure ``settings.LOGGING`` to handle log messages from ``modernrpc`` module.
+Here is a basic example of such a configuration:
+
+.. code:: python
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            # Your formatters configuration...
+        },
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            # your other loggers configuration
+            'modernrpc': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        }
+    }
+
+All information about logging configuration can be found in `official Django docs`_.
+
+.. _official Django docs: https://docs.djangoproject.com/en/dev/topics/logging/#configuring-logging
+
+.. note::
+   Logging configuration is optional. If not configured, the errors will still be visible in logs unless you set
+   :ref:`MODERNRPC_LOG_EXCEPTIONS` to `False`. See :ref:`Logging errors`

@@ -87,10 +87,10 @@ directly with your favourite HTTP client
 .. code-block:: python
    :caption: XML-RPC example
 
-    >>> from xmlrpc.client import ServerProxy
-    >>>
-    >>> with ServerProxy("http://localhost:8000/rpc") as proxy:
-    >>>    proxy.system.listMethods()
-    >>>    proxy.add(5, 9)
-    ['add', 'system.listMethods', 'system.methodHelp', 'system.methodSignature', 'system.multicall']
-    14
+   from xmlrpc.client import ServerProxy
+   with ServerProxy("http://localhost:8000/rpc") as proxy:
+       proxy.system.listMethods()
+       proxy.add(5, 9)
+
+    # ['add', 'system.listMethods', 'system.methodHelp', 'system.methodSignature', 'system.multicall']
+    # 14
