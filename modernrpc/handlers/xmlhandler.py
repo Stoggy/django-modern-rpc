@@ -62,7 +62,12 @@ class XMLRPCHandler(RPCHandler):
     def valid_content_types():
         return [
             "text/xml",
+            "application/xml",
         ]
+
+    @staticmethod
+    def response_content_types() -> str:
+        return "application/json"
 
     def process_request(self, request_body: str, context: RPCRequestContext) -> str:
         """
