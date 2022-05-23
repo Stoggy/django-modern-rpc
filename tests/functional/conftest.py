@@ -32,11 +32,17 @@ class AbstractRpcTestClient(ABC):
     def __init__(self, url, **kwargs):
         self._url = url
         self._auth = kwargs.get("auth")
+        self._content_type = kwargs.get("content_type", self.default_content_type)
+
+    @property
+    @abstractmethod
+    def default_content_type(self):
+        ...
 
     @staticmethod
     def assert_exception_code(exception, error_code):
         """
-        Check error reponse exception code to verify it the expected one
+        Check error response exception code to verify it the expected one
 
         :param exception: The exception instance
         :param error_code: Error code, as int
@@ -50,44 +56,79 @@ class AbstractRpcTestClient(ABC):
         """Build headers specific to cliet configuration.
 
         Base implementation will only set Authorization header"""
+
+        _headers = {
+            "Content-Type": self._content_type,
+        }
+
         if not self._auth:
-            return {}
+            return _headers
 
         kind, *_ = self._auth
-        if kind in ("basic", "basic_auth"):
-            _, username, password = self._auth
-            credz = "{}:{}".format(username, password)
-            b64_credz = base64.standard_b64encode(credz.encode("utf-8")).decode("utf-8")
-            return {"Authorization": "Basic {}".format(b64_credz)}
-        raise ValueError("Unknown Authentication kind: {}".format(kind))
+
+        if kind not in ("basic", "basic_auth"):
+            raise ValueError("Unknown Authentication kind: {}".format(kind))
+
+        _, username, password = self._auth
+        credz = "{}:{}".format(username, password)
+        b64_credz = base64.standard_b64encode(credz.encode("utf-8")).decode("utf-8")
+
+        _headers["Authorization"] = "Basic {}".format(b64_credz)
+        return _headers
 
     @abstractmethod
     def call(self, method, args=None):
         """Perform a standard RPC call"""
-        pass
+
+    @abstractmethod
+    def check_response_headers(self, headers):
+        """Raise exception when invalid headers are detected in response"""
 
 
 class AbstractJsonRpcTestClient(AbstractRpcTestClient):
-    def __init__(self, url, **kwargs):
-        super().__init__(url, **kwargs)
-        self._content_type = kwargs.get("jsonrpc_content_type", "application/json")
-
-    def _get_headers(self):
-        headers = {"Content-Type": self._content_type}
-        headers.update(super()._get_headers())
-        return headers
+    @property
+    def default_content_type(self):
+        return "application/json"
 
     @abstractmethod
     def batch_request(self, calls_data):
         """Perform a JSON-RPC batch request"""
         pass
 
+    def check_response_headers(self, headers):
+        """Raise exception when invalid headers are detected in response"""
+        response_ct = headers["Content-Type"]
+        expected_ct = "application/json"
+        if not response_ct.startswith(expected_ct):
+            error_msg = (
+                'Invalid Content-Type returned by server: "{}". Expected: "{}"'.format(
+                    response_ct, expected_ct
+                )
+            )
+            raise ValueError(error_msg)
+
 
 class AbstractXmlRpcTestClient(AbstractRpcTestClient):
+    @property
+    def default_content_type(self):
+        return "text/xml"
+
     @abstractmethod
     def multicall(self, calls_data):
         """Perform an XML-RPC multicall"""
         pass
+
+    def check_response_headers(self, headers):
+        """Raise exception when invalid headers are detected in response"""
+        response_ct = headers["Content-Type"]
+        expected_ct = "text/xml"
+        if not response_ct.startswith(expected_ct):
+            error_msg = (
+                'Invalid Content-Type returned by server: "{}". Expected: "{}"'.format(
+                    response_ct, expected_ct
+                )
+            )
+            raise ValueError(error_msg)
 
 
 class JsonrpcclientlibClient(AbstractJsonRpcTestClient):
@@ -117,6 +158,9 @@ class JsonrpcclientlibClient(AbstractJsonRpcTestClient):
             raise JsonrpcErrorResponse(
                 exc.response.code, exc.response.message, exc.response.data
             )
+
+        self.check_response_headers(response.raw.headers)
+
         return response.data.result
 
     def batch_request(self, calls_data):
@@ -135,6 +179,9 @@ class JsonrpcclientlibClient(AbstractJsonRpcTestClient):
                 )
 
         response = self._client.send(batch, headers=self._get_headers())
+
+        self.check_response_headers(response.raw.headers)
+
         return None if not response.raw.content else response.raw.json()
 
 
@@ -161,11 +208,12 @@ class PythonXmlRpcClient(AbstractXmlRpcTestClient):
         self._client = xmlrpc.client.ServerProxy(self._url, transport=self._transport)
 
     def _get_headers_list(self):
-        """Copy current headers dict to a List[Tuple[str, str]] instance"""
+        """Copy current headers' dict to a List[Tuple[str, str]] instance"""
         return [(key, value) for key, value in self._get_headers().items()]
 
     def call(self, method, *args):
-        return getattr(self._client, method)(*args)
+        _rpc_method = getattr(self._client, method)
+        return _rpc_method(*args)
 
     def multicall(self, calls_data):
         multicall = xmlrpc.client.MultiCall(self._client)
@@ -209,19 +257,43 @@ def jsonrpc_content_type(request):
     return request.param
 
 
+@pytest.fixture(
+    scope="session",
+    params=["application/xml", "text/xml"],
+)
+def xmlrpc_content_type(request):
+    """
+    A Content-Type value supported by XML-RPC handler.
+
+    Fixture parametrization will cause each XML-RPC test to be run N times
+    """
+    return request.param
+
+
 @pytest.fixture(scope="function", params=[PythonXmlRpcClient])
-def xmlrpc_client(live_server, endpoint_path, client_auth, request):
+def xmlrpc_client(
+    live_server, endpoint_path, client_auth, xmlrpc_content_type, request
+):
     """A xml-rpc only client"""
     klass = request.param
-    return klass(live_server.url + endpoint_path, auth=client_auth)
+    return klass(
+        live_server.url + endpoint_path,
+        auth=client_auth,
+        content_type=xmlrpc_content_type,
+    )
 
 
 @pytest.fixture(scope="function", params=[PythonXmlRpcClient])
-def xmlrpc_client_with_builtin_types(live_server, endpoint_path, client_auth, request):
+def xmlrpc_client_with_builtin_types(
+    live_server, endpoint_path, client_auth, xmlrpc_content_type, request
+):
     """A xml-rpc only client with builtin types enabled"""
     klass = request.param
     return klass(
-        live_server.url + endpoint_path, auth=client_auth, use_builtin_types=True
+        live_server.url + endpoint_path,
+        auth=client_auth,
+        content_type=xmlrpc_content_type,
+        use_builtin_types=True,
     )
 
 
@@ -234,18 +306,12 @@ def jsonrpc_client(
     return klass(
         live_server.url + endpoint_path,
         auth=client_auth,
-        jsonrpc_content_type=jsonrpc_content_type,
+        content_type=jsonrpc_content_type,
     )
 
 
 @pytest.fixture(scope="function", params=[JsonrpcclientlibClient, PythonXmlRpcClient])
-def any_rpc_client(
-    live_server, endpoint_path, client_auth, jsonrpc_content_type, request
-):
+def any_rpc_client(live_server, endpoint_path, client_auth, request):
     """A RPC client (xml-rpc or json-rpc)"""
     klass = request.param
-    return klass(
-        live_server.url + endpoint_path,
-        auth=client_auth,
-        jsonrpc_content_type=jsonrpc_content_type,
-    )
+    return klass(live_server.url + endpoint_path, auth=client_auth)

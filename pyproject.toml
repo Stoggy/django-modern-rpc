@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "django-modern-rpc"
-version = "1.0.0a1"
+version = "1.0.0a2"
 
 authors = ["Antoine Lorence <antoine.lorence@gmail.com>"]
 description = "Simple and powerful RPC server for your Django project"
@@ -62,6 +62,10 @@ jsonrpcclient = "^3.3"
 requests = "*"
 docutils = "*"
 markdown = "*"
+
+sphinx = { version = "^4", python = ">=3.6" }
+sphinx-autobuild = { version = "^2021", python = ">=3.6" }
+sphinx-book-theme = {version = "^0.3", python = ">=3.7"}
 
 tox = "^3.24.5"
 # pytest 6.1 doesn't run with python 3.10. But pytest 6.2 requires at least python 3.6
